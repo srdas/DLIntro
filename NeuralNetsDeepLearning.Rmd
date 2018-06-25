@@ -1,0 +1,912 @@
+---
+title: "Statistical Brains: Neural Networks"
+author: "Sanjiv Das"
+output: slidy_presentation
+---
+
+## Overview
+
+Neural networks are special forms of nonlinear regressions where the decision system for which the NN is built mimics the way the brain is supposed to work (whether it works like a NN is up for grabs of course). 
+
+Terrific online book: http://neuralnetworksanddeeplearning.com/.
+
+See my own book, which is a work-in-progress: http://srdas.github.io/DLBook/.
+
+## Perceptrons
+
+The basic building block of a neural network is a perceptron. A perceptron is like a neuron in a human brain. It takes inputs (e.g. sensory in a real brain) and then produces an output signal. An entire network of perceptrons is called a neural net.
+
+For example, if you make a credit card application, then the inputs comprise a whole set of personal data such as age, sex, income, credit score, employment status, etc, which are then passed to a series of perceptrons in parallel. This is the first **layer** of assessment. Each of the perceptrons then emits an output signal which may then be passed to another layer of perceptrons, who again produce another signal. This second layer is often known as the **hidden** perceptron layer. Finally, after many hidden layers, the signals are all passed to a single perceptron which emits the decision signal to issue you a credit card or to deny your application. 
+
+Perceptrons may emit continuous signals or binary $(0,1)$ signals. In the case of the credit card application, the final perceptron is a binary one. Such perceptrons are implemented by means of **squashing** functions. For example, a really simple squashing function is one that issues a 1 if the function value is positive and a 0 if it is negative. More generally,
+
+\begin{equation}
+S(x) = \left\{
+\begin{array}{cl}
+1 & \mbox{if  } g(x)>T \\
+0 & \mbox{if  } g(x) \leq T 
+\end{array}
+\right.
+\end{equation}
+
+where $g(x)$ is any function taking positive and negative values, for instance, $g(x) \in (-\infty, +\infty)$. $T$ is a threshold level.
+
+A neural network with many layers is also known as a **multi-layered** perceptron, i.e., all those perceptrons together may be thought of as one single, big perceptron. 
+
+```{r MultiLayerPerceptron, fig.cap='', fig.align='center', out.width='75%', fig.asp=0.8, echo=FALSE}
+knitr::include_graphics("DSTMAA_images/MultiLayerPerceptron.png")
+```
+
+**x** is the input layer, **y** is the hidden layer, and **z** is the output layer. 
+
+## Deep Learning
+
+Neural net models are related to **Deep Learning**, where the number of hidden layers is vastly greater than was possible in the past when computational power was limited. Now, deep learning nets cascade through 20-30 layers, resulting in a surprising ability of neural nets in mimicking human learning processes. see: http://en.wikipedia.org/wiki/Deep_learning
+
+And also see: http://deeplearning.net/
+
+## Binary NNs
+
+Binary NNs are also thought of as a category of classifier systems. They are widely used to divide members of a population into classes. But NNs with continuous output are also popular. As we will see later, researchers have used NNs to learn the Black-Scholes option pricing model. 
+
+Areas of application: credit cards, risk management, forecasting corporate defaults, forecasting economic regimes, measuring the gains from mass mailings by mapping demographics to success rates. 
+
+## Squashing Functions
+
+Squashing functions may be more general than just binary. They usually squash the output signal into a narrow range, usually $(0,1)$. A common choice is the logistic function (also known as the sigmoid function). 
+
+\begin{equation}
+f(x) = \frac{1}{1+e^{-w\;x}}
+\end{equation}
+
+Think of $w$ as the adjustable weight. Another common choice is the probit function
+
+\begin{equation}
+f(x) = \Phi(w\;x)
+\end{equation}
+
+where $\Phi(\cdot)$ is the cumulative normal distribution function. 
+
+## How does the NN work?
+
+The easiest way to see how a NN works is to think of the simplest NN, i.e. one with a single perceptron generating a binary output. The perceptron has $n$ inputs, with values $x_i, i=1...n$ and current weights $w_i, i=1...n$. It generates an output $y$. 
+
+The **net input** is defined as 
+
+\begin{equation}
+\sum_{i=1}^n w_i x_i 
+\end{equation}
+
+If a function of the net input is greater than a threshold $T$, then the output signal is $y=1$, and if it is less than $T$, the output is $y=0$. The actual output is called the **desired** output and is denoted $d = \{0,1\}$. Hence, the **training** data provided to the NN comprises both the inputs $x_i$ and the desired output $d$. 
+
+The output of our single perceptron model will be the sigmoid function of the net input, i.e. 
+
+\begin{equation}
+y = \frac{1}{1+\exp\left( - \sum_{i=1}^n w_i x_i  \right)}
+\end{equation}
+
+For a given input set, the error in the NN is given by some loss function, an example of which is below: 
+
+\begin{equation}
+E = \frac{1}{2} \sum_{j=1}^m (y_j - d_j)^2
+\end{equation}
+
+where $m$ is the size of the training data set. The optimal NN for given data is obtained by finding the weights $w_i$ that minimize this error function $E$. Once we have the optimal weights, we have a calibrated **feed-forward** neural net.
+
+For a given squashing function $f$, and input $x = [x_1, x_2, \ldots, x_n]'$, the multi-layer perceptron will given an output at each node of the hidden layer of 
+
+\begin{equation}
+y(x) = f \left(w_0 + \sum_{j=1}^n w_j x_j \right)
+\end{equation}
+
+and then at the final output level the node is 
+
+\begin{equation}
+z(x) = f\left( w_0 + \sum_{i=1}^N w_i \cdot f \left(w_{0i} + \sum_{j=1}^n w_{ji} x_j \right)  \right)
+\end{equation}
+
+where the nested structure of the neural net is quite apparent. The $f$ functions are also known as **activation** functions.  
+
+## Relationship to Logit/Probit Models
+
+The special model above with a single perceptron is actually nothing else than the logit regression model. If the squashing function is taken to the cumulative normal distribution, then the model becomes the probit regression model. In both cases though, the model is fitted by minimizing squared errors, not by maximum likelihood, which is how standard logit/probit models are parameterized. 
+
+## Connection to hyperplanes
+
+Note that in binary squashing functions, the net input is passed through a sigmoid function and then compared to the threshold level $T$. This sigmoid function is a monotone one. Hence, this means that there must be a level $T'$ at which the net input $\sum_{i=1}^n w_i x_i$ must be for the result to be on the cusp. The following is the equation for a hyperplane
+
+\begin{equation}
+\sum_{i=1}^n w_i x_i  = T'
+\end{equation}
+
+which also implies that observations in $n$-dimensional space of the inputs $x_i$, must lie on one side or the other of this hyperplane. If above the hyperplane, then $y=1$, else $y=0$. Hence, single perceptrons in neural nets have a simple geometrical intuition. 
+
+## Gradient Descent
+
+We start with a simple function. We want to minimize this function. But let's plot it first to see where the minimum lies. 
+
+```{r}
+f = function(x) { result = 3*x^2 - 5*x + 10 }
+x = seq(-4,4,0.1)
+plot(x,f(x),type="l")
+```
+
+Next, we solve for $x_{min}$, the value at which the function is minimized, which appears to lie between $0$ and $2$. We do this by gradient descent, from an initial value for $x=-3$. We then run down the function to its minimum but manage the rate of descent using a paramater $\eta=0.10$. The evolution (descent) equation is called recursively through the following dynamics for $x$:  
+
+$$
+x \leftarrow x - \eta \cdot \frac{\partial f}{\partial x}
+$$
+
+If the gradient is positive, then we need to head in the opposite direction to reach the minimum, and hence, we have a negative sign in front of the modification term above. But first we need to calculate the gradient, and the descent. To repeat, first gradient, then descent! 
+
+```{r}
+x = -3
+eta = 0.10
+dx = 0.0001
+grad = (f(x+dx)-f(x))/dx
+x = x - eta*grad
+print(x)
+```
+
+We see that $x$ has moved closer to the value that minimizes the function. We can repeat thismany times till it settles down at the minimum, each round of updates being called an **epoch**. We run 20 epochs next. 
+
+```{r}
+for (j in 1:20) {
+  grad = (f(x+dx)-f(x))/dx
+  x = x - eta*grad
+  print(c(j,x,grad,f(x)))
+}
+```
+
+It has converged really quickly! At convergence, the gradient goes to zero. 
+
+## Feedback and Backpropagation
+
+What distinguishes neural nets from ordinary nonlinear regressions is feedback. Neural nets **learn** from feedback as they are used. Feedback is implemented using a technique called backpropagation.
+
+Suppose you have a calibrated NN. Now you obtain another observation of data and run it through the NN. Comparing the output value $y$ with the desired observation $d$ gives you the error for this observation. If the error is large, then it makes sense to update the weights in the NN, so as to self-correct. This process of self-correction is known as **gradient descent** via **backpropagation**. 
+
+The benefit of gradient descent via backpropagation is that a full re-fitting exercise may not be required. Using simple rules the correction to the weights can be applied gradually in a learning manner. 
+
+Lets look at fitting with a simple example using a single perceptron. Consider the $k$-th perceptron. The sigmoid of this is
+
+\begin{equation}
+y_k = \frac{1}{1+\exp\left( - \sum_{i=1}^n w_{i} x_{ik}  \right)}
+\end{equation}
+
+where $y_k$ is the output of the $k$-th perceptron, and $x_{ik}$ is the $i$-th input to the $k$-th perceptron. The error from this observation is $(y_k - d_k)$. Recalling that $E = \frac{1}{2} \sum_{j=1}^m (y_j - d_j)^2$, we may compute the change in error with respect to the $j$-th output, i.e. 
+
+\begin{equation}
+\frac{\partial E}{\partial y_j} = y_j - d_j, \quad \forall j
+\end{equation}
+
+Note also that 
+
+\begin{equation}
+\frac{dy_j}{dx_{ij}} = y_j (1-y_j) w_i
+\end{equation}
+
+and
+
+\begin{equation}
+\frac{dy_j}{dw_i} = y_j (1-y_j) x_{ij}
+\end{equation}
+
+Next, we examine how the error changes with input values:
+
+\begin{equation}
+\frac{\partial E}{\partial x_{ij}} = \frac{\partial E}{\partial y_j} \times \frac{dy_j}{dx_{ij}} 
+= (y_j - d_j) y_j (1-y_j) w_i
+\end{equation}
+
+We can now get to the value of interest, which is the change in error value with respect to the weights
+
+\begin{equation}
+\frac{\partial E}{\partial w_{i}} = \frac{\partial E}{\partial y_j} \times \frac{dy_j}{dw_i}
+=  (y_j - d_j)y_j (1-y_j) x_{ij}, \forall i
+\end{equation}
+
+We thus have one equation for each weight $w_i$ and each observation $j$. (Note that the $w_i$ apply across perceptrons. A more general case might be where we have weights for each perceptron, i.e., $w_{ij}$.) Instead of updating on just one observation, we might want to do this for many observations in which case the error derivative would be
+
+\begin{equation}
+\frac{\partial E}{\partial w_{i}} = \sum_j (y_j - d_j)y_j (1-y_j) x_{ij}, \forall i
+\end{equation}
+
+Therefore, if $\frac{\partial E}{\partial w_{i}} > 0$, then we would need to reduce $w_i$ to bring down $E$. By how much? Here is where some art and judgment is imposed. There is a tuning parameter $0<\gamma<1$ which we apply to $w_i$ to shrink it when the weight needs to be reduced. Likewise, if the derivative $\frac{\partial E}{\partial w_{i}} < 0$, then we would increase $w_i$ by dividing it by $\gamma$. This is known as **gradient descent**. 
+
+
+## Backpropagation
+
+ 
+### Extension to many observations
+
+Our notation now becomes extended to weights $w_{ik}$ which stand for the weight on the $i$-th input to the $k$-th perceptron. The derivative for the error becomes, across all observations $j$: 
+
+\begin{equation}
+\frac{\partial E}{\partial w_{ik}} = \sum_j (y_j - d_j)y_j (1-y_j) x_{ikj}, \forall i,k
+\end{equation}
+
+Hence all nodes in the network have their weights updated. In many cases of course, we can just take the derivatives numerically. Change the weight $w_{ik}$ and see what happens to the error. 
+
+However, the formal process of finding all the gradients using a fast algorithm via backpropagation requires more formal calculus, and the rest of this section provides detailed analysis showing how this is done. 
+
+## Backprop: Detailed Analysis
+
+In this section, we dig deeper into the incredible algebra that drives the unreasonable effectiveness of deep learning algorithms. To do this, we will work with a richer algebra, and extended notation. 
+
+### Net Input
+
+Assume several hidden layers in a deep learning net (DLN), indexed by $r=1,2,...,R$. Consider two adjacent layers $(r)$ and $(r+1)$. Each layer as number of nodes $n_r$ and $n_{r+1}$, respectively. 
+
+The output of node $i$ in layer $(r)$ is $Z_i^{(r)} = f(a_i^{(r)})$. The function $f$ is the *activation* function. At node $j$ in layer $(r+1)$, these inputs are taken and used to compute an intermediate value, known as the *net value*: 
+
+$$
+a_j^{(r+1)} = \sum_{i=1}^{n_r} W_{ij}^{(r+1)}Z_i^{r} + b_j^{(r+1)}
+$$
+
+### Activation Function
+
+The net value is then ingested by an activation function to create the output from layer $(r+1)$. 
+
+$$
+Z_j^{(r+1)} = f(a_j^{(r+1)})
+$$
+
+The activation functions may be simple sigmoid functions or other functions such as ReLU (Rectified Linear Unit). The final output of the DLN is from layer $(R)$, i.e., $Z_j^{(R)}$. 
+
+For the first hidden layer $r=1$, and the net input will be based on the original data $X^{(m)}$
+
+$$
+a_j^{(1)} = \sum_{m=1}^M W_{mj}^{(1)} X_m + b_j^{(1)}
+$$
+
+### Loss Function
+
+Fitting the DLN is an exercise where the best weights $\{W,b\} = \{W_{ij}^{(r+1)}, b_j^{(r+1)}\},\forall r$ for all layers are determined to minimize a loss function generally denoted as
+
+$$
+\min_{W,b} \sum_{m=1}^M L_m[h(X^{(m)}),T^{(m)}]
+$$
+
+where $M$ is the number of training observations (rows in the data set), $T^{(m)}$ is the true value of the output, and $h(X^{(m)})$ is the model output from the DLN. The loss function $L_m$ quantifies the difference between the model output and the true output. 
+
+### Gradients
+
+To solve this minimization problem, we need gradients for all $W,b$. These are denoted as 
+
+$$
+\frac{\partial L_m}{\partial W_{ij}^{(r+1)}}, \quad \frac{\partial L_m}{\partial b_{j}^{(r+1)}}, \quad \forall r+1, j
+$$
+
+We write out these gradients using the chain rule: 
+
+$$
+\frac{\partial L_m}{\partial W_{ij}^{(r+1)}} = \frac{\partial L_m}{\partial a_j^{(r+1)}} \cdot \frac{\partial a_j^{(r+1)}}{\partial W_{ij}^{(r+1)}} = \delta_j^{(r+1)} \cdot Z_i^{(r)}
+$$
+
+where we have written 
+
+$$
+\delta_j^{(r+1)} = \frac{\partial L_m}{\partial a_j^{(r+1)}}
+$$
+
+Likewise, we have 
+
+$$
+\frac{\partial L_m}{\partial b_{j}^{(r+1)}} = \frac{\partial L_m}{\partial a_j^{(r+1)}} \cdot \frac{\partial a_j^{(r+1)}}{\partial b_{j}^{(r+1)}} = \delta_j^{(r+1)} \cdot 1 = \delta_j^{(r+1)}
+$$
+
+### Delta Values
+
+So we need to find all the $\delta_j^{(r+1)}$ values. To do so, we need the following intermediate calculation. 
+
+$$
+\begin{align}
+a_j^{(r+1)} &= \sum_{i=1}^{n_r} W_{ij}^{(r+1)} Z_i^{(r)} + b_j^{(r+1)} \\
+&= \sum_{i=1}^{n_r} W_{ij}^{(r+1)} f(a_i^{(r)}) + b_j^{(r+1)} \\
+\end{align}
+$$
+
+This implies that 
+
+$$
+\frac{\partial a_j^{(r+1)}}{\partial a_i^{(r)}} = W_{ij}^{(r+1)} \cdot f'(a_i^{(r)})
+$$
+
+Using this we may now rewrite the $\delta$ value for layer $(r)$ as follows:
+
+$$
+\begin{align}
+\delta_i^{(r)} &= \frac{\partial L_m}{\partial a_i^{(r)}} \\ 
+&= \sum_{j=1}^{n_{r+1}} \frac{\partial L_m}{\partial a_j^{(r+1)}} \cdot \frac{\partial a_j^{(r+1)}}{\partial a_i^{(r)}} \\
+&= \sum_{j=1}^{n_{r+1}}\delta_j^{(r+1)} \cdot W_{ij}^{(r+1)} \cdot f'(a_i^{(r)}) \\
+&= f'(a_i^{(r)}) \cdot \sum_{j=1}^{n_{r+1}}\delta_j^{(r+1)} \cdot W_{ij}^{(r+1)}  
+\end{align} 
+$$
+
+### Output layer
+
+The output layer takes as input the last hidden layer ${(R)}$'s output $Z_j^{(R)}$, and computes the net input $a_j^{(R+1)}$ and then the activation function $h(a_j^{(R+1)})$ is applied to generate the final output. 
+
+$$
+\begin{align}
+a_j^{(R+1)} &= \sum_{i=1}^{n_R} W_{ij}^{(R+1)} Z_j^{(R)} + b_j^{(R+1)} \\
+\mbox{Final output} &= h(a_j^{(R+1)})
+\end{align}
+$$
+
+The $\delta$ for the final layer is simple. 
+
+$$
+\delta_j^{(R+1)} = \frac{\partial L_m}{\partial a_j^{(R+1)}} = h'(a_j^{(R+1)})
+$$
+
+### Feedforward and Backward Propagation
+
+Fitting the DLN requires getting the weights $\{W,b\}$ that minimize $L_m$. These are done using gradient descent, i.e., 
+
+$$
+\begin{align}
+W_{ij}^{(r+1)} \leftarrow W_{ij}^{(r+1)} - \eta \cdot \frac{\partial L_m}{\partial W_{ij}^{(r+1)}} \\
+b_{j}^{(r+1)} \leftarrow b_{j}^{(r+1)} - \eta \cdot \frac{\partial L_m}{\partial b_{j}^{(r+1)}}
+\end{align}
+$$
+
+Here $\eta$ is the learning rate parameter. We iterate on these functions until the gradients become zero, and the weights discontinue changing with each update, also known as an **epoch**. 
+
+The steps are as follows: 
+
+1. Start with an initial set of weights $\{w,b\}$. 
+2. Feedforward the initial data and weights into the DLN, and find the $\{a_i^{(r)}, Z_i^{(r)}\}, \forall r,i$. This is one forward pass through the network. 
+3. Then, using backpropagation, compute all $\delta_i^{(r)}, \forall r,i$. 
+4. Use these $\delta_i^{(r)}$ values to get all the new gradients. 
+5. Apply gradient descent to get new weights. 
+6. Keep iterating steps 2-5, until the chosen number of epochs is completed. 
+
+The entire process is summarized in Figure \@ref(fig:BackPropSummary): 
+
+```{r BackPropSummary, fig.cap='Quick Summary of Backpropagation', fig.align='center', out.width='75%', fig.asp=0.8, echo=FALSE}
+knitr::include_graphics("DSTMAA_images/Backpropagation_slide.png")
+```
+
+
+## Research Applications
+
+- Discovering Black-Scholes: See the paper by @RePEc:bla:jfinan:v:49:y:1994:i:3:p:851-89, A Nonparametric Approach to Pricing and Hedging Securities Via Learning Networks, The Journal of Finance, Vol XLIX.
+
+- Forecasting: See the paper by @CIS-201490. “A dynamic artificial neural network model for forecasting time series events,” International Journal of Forecasting 21, 341–362.
+
+## Package *neuralnet* in R
+
+The package focuses on multi-layer perceptrons (MLP), see Bishop (1995), which are well applicable when modeling functional relation- ships. The underlying structure of an MLP is a directed graph, i.e. it consists of vertices and directed edges, in this context called neurons and synapses. See Bishop (1995), Neural networks for pattern recognition. Oxford University Press, New York. 
+
+The data set used by this package as an example is the infert data set that comes bundled with R.
+
+This data set examines infertility after induced and spontaneous abortion. The variables **induced** and **spontaneous** take values in $\{0,1,2\}$ indicating the number of previous abortions. The variable **parity** denotes the number of births. The variable **case** equals 1 if the woman is infertile and 0 otherwise. The idea is to model infertility. 
+
+```{r}
+library(neuralnet)
+data(infert)
+print(names(infert))
+head(infert)
+```
+
+```{r}
+summary(infert)
+```
+
+This data set examines infertility after induced and spontaneous abortion. The variables ** induced** and **spontaneous** take values in $\{0,1,2\}$ indicating the number of previous abortions. The variable **parity** denotes the number of births. The variable **case** equals 1 if the woman is infertile and 0 otherwise. The idea is to model infertility. 
+
+### First step, fit a logit model to the data. 
+
+```{r}
+res = glm(case ~ age+parity+induced+spontaneous, family=binomial(link="logit"), data=infert)
+summary(res)
+```
+
+### Second step, fit a NN
+
+```{r}
+nn = neuralnet(case~age+parity+induced+spontaneous,hidden=2,data=infert)
+```
+
+```{r}
+print(names(nn))
+nn$result.matrix
+```
+
+```{r}
+plot(nn)
+#Run this plot from the command line.
+#<img src="image_files/nn.png" height=510 width=740>
+```
+
+
+```{r}
+head(cbind(nn$covariate,nn$net.result[[1]]))
+```
+
+### Logit vs NN
+
+We can compare the output to that from the logit model, by looking at the correlation of the fitted values from both models.
+
+```{r}
+cor(cbind(nn$net.result[[1]],res$fitted.values))
+```
+
+### Backpropagation option
+
+We can add in an option for back propagation, and see how the results change.
+
+```{r}
+nn2 = neuralnet(case~age+parity+induced+spontaneous, 
+             hidden=2, algorithm="rprop+", data=infert)
+print(cor(cbind(nn2$net.result[[1]],res$fitted.values)))
+cor(cbind(nn2$net.result[[1]],nn$fitted.result[[1]]))
+```
+
+Given a calibrated neural net, how do we use it to compute values for a new observation? Here is an example. 
+
+```{r}
+compute(nn,covariate=matrix(c(30,1,0,1),1,4))
+```
+
+## Statistical Significance
+
+We can assess statistical significance of the model as follows:
+
+```{r}
+confidence.interval(nn,alpha=0.10)
+```
+
+The confidence level is $(1-\alpha)$. This is at the 90% level, and at the 5% level we get:
+
+```{r}
+confidence.interval(nn,alpha=0.95)
+```
+
+
+
+## Deep Learning Overview
+
+The Wikipedia entry is excellent: https://en.wikipedia.org/wiki/Deep_learning
+
+http://deeplearning.net/
+
+https://www.youtube.com/watch?v=S75EdAcXHKk
+
+https://www.youtube.com/watch?v=czLI3oLDe8M
+
+Article on Google's Deep Learning team's work on image processing:  https://medium.com/backchannel/inside-deep-dreams-how-google-made-its-computers-go-crazy-83b9d24e66df#.gtfwip891
+
+### Grab Some Data
+
+The **mlbench** package contains some useful datasets for testing machine learning algorithms. One of these is a small dataset of cancer cases, and contains ten characteristics of cancer cells, and a flag for whether cancer is present or the cells are benign. We use this dataset to try out some deep learning algorithms in R, and see if they improve on vanilla neural nets. First, let's fit a neural net to this data. We'll fit this using the **deepnet** package, which allows for more hidden layers. 
+
+### Simple Example 
+
+```{r}
+library(neuralnet)
+library(deepnet)
+```
+
+First, we use randomly generated data, and train the NN.
+
+```{r}
+#From the **deepnet** package by Xiao Rong. First train the model using one hidden layer. 
+Var1 <- c(rnorm(50, 1, 0.5), rnorm(50, -0.6, 0.2))
+Var2 <- c(rnorm(50, -0.8, 0.2), rnorm(50, 2, 1))
+x <- matrix(c(Var1, Var2), nrow = 100, ncol = 2)
+y <- c(rep(1, 50), rep(0, 50))
+plot(x,col=y+1)
+nn <- nn.train(x, y, hidden = c(5))
+```
+
+### Prediction
+
+```{r}
+#Next, predict the model. This is in-sample.
+test_Var1 <- c(rnorm(50, 1, 0.5), rnorm(50, -0.6, 0.2))
+test_Var2 <- c(rnorm(50, -0.8, 0.2), rnorm(50, 2, 1))
+test_x <- matrix(c(test_Var1, test_Var2), nrow = 100, ncol = 2)
+yy <- nn.predict(nn, test_x)
+```
+
+### Test Predictive Ability of the Model
+
+```{r}
+#The output is just a number that is higher for one class and lower for another. 
+#One needs to separate these to get groups. 
+yhat = matrix(0,length(yy),1)
+yhat[which(yy > mean(yy))] = 1
+yhat[which(yy <= mean(yy))] = 0
+print(table(yhat,y))
+```
+
+### Prediction Error
+
+```{r}
+#Testing the results. 
+err <- nn.test(nn, test_x, y, t=mean(yy))
+print(err)
+```
+
+## Cancer dataset
+
+Now we'll try the Breast Cancer data set. First we use the NN in the **deepnet** package. 
+
+```{r}
+library(mlbench)
+data("BreastCancer")
+head(BreastCancer)
+
+BreastCancer = BreastCancer[which(complete.cases(BreastCancer)==TRUE),]
+```
+
+```{r}
+y = as.matrix(BreastCancer[,11])
+y[which(y=="benign")] = 0
+y[which(y=="malignant")] = 1
+y = as.numeric(y)
+x = as.numeric(as.matrix(BreastCancer[,2:10]))
+x = matrix(as.numeric(x),ncol=9)
+nn <- nn.train(x, y, hidden = c(5))
+yy = nn.predict(nn, x)
+
+yhat = matrix(0,length(yy),1)
+yhat[which(yy > mean(yy))] = 1
+yhat[which(yy <= mean(yy))] = 0
+print(table(y,yhat))
+```
+
+### Compare to a simple NN
+
+It does really well. Now we compare it to a simple neural net. 
+
+```{r}
+library(neuralnet)
+df = data.frame(cbind(x,y))
+nn = neuralnet(y~V1+V2+V3+V4+V5+V6+V7+V8+V9,data=df,hidden = 5)
+yy = nn$net.result[[1]]
+yhat = matrix(0,length(y),1)
+yhat[which(yy > mean(yy))] = 1
+yhat[which(yy <= mean(yy))] = 0
+print(table(y,yhat))
+```
+
+Somehow, the **neuralnet** package appears to perform better. Which is interesting. But the deep learning net was not "deep" - it had only one hidden layer. 
+
+## Deeper Net: More Hidden Layers
+
+Now we'll try the **deepnet** function with two hidden layers.
+
+```{r}
+dnn <- sae.dnn.train(x, y, hidden = c(5,5))
+yy = nn.predict(dnn, x)
+
+yhat = matrix(0,length(yy),1)
+yhat[which(yy > mean(yy))] = 1
+yhat[which(yy <= mean(yy))] = 0
+print(table(y,yhat))
+```
+
+This performs terribly. Maybe there is something wrong here.
+
+## Using h2o
+
+Here we start up a server using all cores of the machine, and then use the h2o package's deep learning toolkit to fit a model. 
+
+```{r}
+library(h2o)
+localH2O = h2o.init(ip="localhost", port = 54321, 
+                    startH2O = TRUE, nthreads=-1)
+
+train <- h2o.importFile("DSTMAA_data/BreastCancer.csv")
+test <- h2o.importFile("DSTMAA_data/BreastCancer.csv")
+
+y = names(train)[11]
+x = names(train)[1:10]
+
+
+train[,y] = as.factor(train[,y])
+test[,y] = as.factor(train[,y])
+
+model = h2o.deeplearning(x=x, 
+                         y=y, 
+                         training_frame=train, 
+                         validation_frame=test, 
+                         distribution = "multinomial",
+                         activation = "RectifierWithDropout",
+                         hidden = c(10,10,10,10),
+                         input_dropout_ratio = 0.2,
+                         l1 = 1e-5,
+                         epochs = 50)
+
+model
+```
+
+The h2o deep learning package does very well. 
+
+```{r}
+#h2o.shutdown(prompt=FALSE)
+```
+
+
+## Character Recognition 
+
+We use the MNIST dataset
+
+```{r}
+library(h2o)
+localH2O = h2o.init(ip="localhost", port = 54321, 
+                    startH2O = TRUE)
+
+## Import MNIST CSV as H2O
+train <- h2o.importFile("DSTMAA_data/train.csv")
+test <- h2o.importFile("DSTMAA_data/test.csv")
+
+#summary(train)
+#summary(test)
+```
+
+```{r}
+y <- "C785"
+x <- setdiff(names(train), y)
+train[,y] <- as.factor(train[,y])
+test[,y] <- as.factor(test[,y])
+
+# Train a Deep Learning model and validate on a test set
+model <- h2o.deeplearning(x = x,
+                          y = y,
+                          training_frame = train,
+                          validation_frame = test,
+                          distribution = "multinomial",
+                          activation = "RectifierWithDropout",
+                          hidden = c(100,100,100),
+                          input_dropout_ratio = 0.2,
+                          l1 = 1e-5,
+                          epochs = 20)
+
+model
+```
+
+## Deep Learning with TensorFlow
+
+```{r}
+reticulate::use_python("/Users/sdas/anaconda3/bin/python")
+library(tensorflow)
+library(kerasR)
+#library(keras)
+```
+
+Set up data
+
+```{r}
+tf_train <- read.csv("DSTMAA_data/BreastCancer.csv")
+tf_test <- read.csv("DSTMAA_data/BreastCancer.csv")
+
+X_train = as.matrix(tf_train[,2:10])
+X_test = as.matrix(tf_test[,2:10])
+y_train = as.matrix(tf_train[,11])
+y_test = as.matrix(tf_test[,11])
+
+idx = which(y_train=="benign"); y_train[idx]=0; y_train[-idx]=1; y_train=as.integer(y_train)
+idx = which(y_test=="benign"); y_test[idx]=0; y_test[-idx]=1; y_test=as.integer(y_test)
+
+Y_train <- to_categorical(y_train,2)
+```
+
+Set up and compile the model
+
+```{r}
+n_units = 512 
+
+mod <- Sequential()
+mod$add(Dense(units = n_units, input_shape = dim(X_train)[2]))
+mod$add(LeakyReLU())
+mod$add(Dropout(0.25))
+
+mod$add(Dense(units = n_units))
+mod$add(LeakyReLU())
+mod$add(Dropout(0.25))
+
+mod$add(Dense(units = n_units))
+mod$add(LeakyReLU())
+mod$add(Dropout(0.25))
+
+mod$add(Dense(units = n_units))
+mod$add(LeakyReLU())
+mod$add(Dropout(0.25))
+
+mod$add(Dense(units = n_units))
+mod$add(LeakyReLU())
+mod$add(Dropout(0.25))
+
+mod$add(Dense(2))
+mod$add(Activation("softmax"))
+
+keras_compile(mod, loss = 'categorical_crossentropy', optimizer = RMSprop())
+```
+
+Fit the deep learning net
+
+```{r}
+keras_fit(mod, X_train, Y_train, batch_size = 32, epochs = 15, verbose = 2,
+validation_split = 1.0)
+```
+
+Check accuracy and predictions. 
+
+```{r}
+#In-sample
+Y_train_hat <- keras_predict_classes(mod, X_train)
+table(y_train, Y_train_hat)
+print(c("Mean in-sample accuracy = ",mean(y_train == Y_train_hat)))
+
+#Validation
+Y_test_hat <- keras_predict_classes(mod, X_test)
+table(y_test, Y_test_hat)
+print(c("Mean validation accuracy = ",mean(y_test == Y_test_hat)))
+```
+
+## The MNIST Example: The "Hello World" of Deep Learning
+
+Load in the MNIST data. Example taken from: https://cran.r-project.org/web/packages/kerasR/vignettes/introduction.html
+
+```{r}
+library(data.table)
+train = as.data.frame(fread("DSTMAA_data/train.csv"))
+test = as.data.frame(fread("DSTMAA_data/test.csv"))
+#mnist <- load_mnist()
+X_train <- as.matrix(train[,-1])
+Y_train <- as.matrix(train[,785])
+X_test <- as.matrix(test[,-1])
+Y_test <- as.matrix(test[,785])
+dim(X_train)
+```
+
+Notice that the training dataset is in the form of 3d tensors, of size $60,000 \times 28 \times 28$. This is where the "tensor" moniker comes from, and the "flow" part comes from the internal representation of the calculations on a flow network from input to eventual output. 
+
+## Normalization
+
+Now we normalize the values, which are pixel intensities ranging in $(0,255)$. 
+
+```{r}
+X_train <- array(X_train, dim = c(dim(X_train)[1], prod(dim(X_train)[-1]))) / 255
+X_test <- array(X_test, dim = c(dim(X_test)[1], prod(dim(X_test)[-1]))) / 255
+```
+
+Convert the $Y$ variable to categorical. 
+
+```{r}
+Y_train <- to_categorical(Y_train, 10)
+```
+
+## Construct the Deep Learning Net
+
+Now create the model in Keras. 
+
+```{r}
+n_units = 100  ## tf example is 512, acc=95%, with 100, acc=96%
+
+mod <- Sequential()
+mod$add(Dense(units = n_units, input_shape = dim(X_train)[2]))
+mod$add(LeakyReLU())
+mod$add(Dropout(0.25))
+
+mod$add(Dense(units = n_units))
+mod$add(LeakyReLU())
+mod$add(Dropout(0.25))
+
+mod$add(Dense(units = n_units))
+mod$add(LeakyReLU())
+mod$add(Dropout(0.25))
+
+mod$add(Dense(10))
+mod$add(Activation("softmax"))
+```
+
+## Compilation
+
+Then, compile the model. 
+
+```{r}
+keras_compile(mod, loss = 'categorical_crossentropy', optimizer = RMSprop())
+```
+
+## Fit the Model
+
+Now run the model to get a fitted deep learning network. 
+
+```{r}
+keras_fit(mod, X_train, Y_train, batch_size = 32, epochs = 5, verbose = 2,
+validation_split = 0.1)
+```
+
+## Quality of Fit
+
+Check accuracy and predictions. 
+
+```{r}
+Y_test_hat <- keras_predict_classes(mod, X_test)
+table(Y_test, Y_test_hat)
+mean(Y_test == as.matrix(Y_test_hat))
+```
+
+
+
+## MxNet Package
+
+The package needs the correct version of Java to run. 
+
+```{r, eval=FALSE}
+#From R-bloggers
+require(mlbench)
+## Loading required package: mlbench
+require(mxnet)
+## Loading required package: mxnet
+## Loading required package: methods
+data(Sonar, package="mlbench")
+
+Sonar[,61] = as.numeric(Sonar[,61])-1
+train.ind = c(1:50, 100:150)
+train.x = data.matrix(Sonar[train.ind, 1:60])
+train.y = Sonar[train.ind, 61]
+test.x = data.matrix(Sonar[-train.ind, 1:60])
+test.y = Sonar[-train.ind, 61]
+
+mx.set.seed(0)
+model <- mx.mlp(train.x, train.y, hidden_node=10, out_node=2, out_activation="softmax", num.round=100, array.batch.size=15, learning.rate=0.25, momentum=0.9,                eval.metric=mx.metric.accuracy)
+
+preds = predict(model, test.x)
+## Auto detect layout of input matrix, use rowmajor..
+pred.label = max.col(t(preds))-1
+table(pred.label, test.y)
+
+```
+
+### Cancer Data
+
+Now an example using the BreastCancer data set. 
+
+```{r, eval=FALSE}
+data("BreastCancer")
+BreastCancer = BreastCancer[which(complete.cases(BreastCancer)==TRUE),]
+
+y = as.matrix(BreastCancer[,11])
+y[which(y=="benign")] = 0
+y[which(y=="malignant")] = 1
+y = as.numeric(y)
+x = as.numeric(as.matrix(BreastCancer[,2:10]))
+x = matrix(as.numeric(x),ncol=9)
+
+train.x = x
+train.y = y
+test.x = x
+test.y = y
+
+mx.set.seed(0)
+model <- mx.mlp(train.x, train.y, hidden_node=5, out_node=10, out_activation="softmax", num.round=30, array.batch.size=15, learning.rate=0.07, momentum=0.9,                eval.metric=mx.metric.accuracy)
+
+preds = predict(model, test.x)
+## Auto detect layout of input matrix, use rowmajor..
+pred.label = max.col(t(preds))-1
+table(pred.label, test.y)
+```
+
+## Visualization of Neural Nets using Tensorflow
+
+See:  http://playground.tensorflow.org/
+
+
+## Convolutional Neural Nets (CNNs)
+
+See: http://srdas.github.io/DLBook/ConvNets.html
+
+See: https://adeshpande3.github.io/adeshpande3.github.io/A-Beginner's-Guide-To-Understanding-Convolutional-Neural-Networks/
+
+
+
+## Recurrent Neural Nets (RNNs)
+
+See: http://srdas.github.io/DLBook/RNNs.html
