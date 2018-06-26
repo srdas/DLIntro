@@ -11906,6 +11906,7 @@ a.anchor-link {
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h1 id="Deep-Learning:-Introduction"><font color="blue">Deep Learning: Introduction</font><a class="anchor-link" href="#Deep-Learning:-Introduction">&#182;</a></h1><h2 id="Sanjiv-R.-Das">Sanjiv R. Das<a class="anchor-link" href="#Sanjiv-R.-Das">&#182;</a></h2><h3 id="Professor-of-Finance-and-Data-Science">Professor of Finance and Data Science<a class="anchor-link" href="#Professor-of-Finance-and-Data-Science">&#182;</a></h3><h3 id="Santa-Clara-University">Santa Clara University<a class="anchor-link" href="#Santa-Clara-University">&#182;</a></h3><h2 id="London,-June-2018"><font color="green">London, June 2018</font><a class="anchor-link" href="#London,-June-2018">&#182;</a></h2><p>REFERENCE BOOK: <a href="http://srdas.github.io/DLBook">http://srdas.github.io/DLBook</a></p>
+<p>Github: <a href="http://github.com/srdas/DLIntro">http://github.com/srdas/DLIntro</a></p>
 
 </div>
 </div>
@@ -11927,7 +11928,7 @@ a.anchor-link {
 </div></section></section><section><section>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">pylab</span> inline
@@ -11950,19 +11951,6 @@ a.anchor-link {
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Populating the interactive namespace from numpy and matplotlib
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>/Users/srdas/anaconda3/lib/python3.6/site-packages/IPython/core/magics/pylab.py:160: UserWarning: pylab import has clobbered these variables: [&#39;norm&#39;]
-`%matplotlib` prevents importing * from pylab and numpy
-  &#34;\n`%matplotlib` prevents importing * from pylab and numpy&#34;
 </pre>
 </div>
 </div>
@@ -12033,7 +12021,7 @@ $$</p>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Examples-of-Different-Types-of-Neurons">Examples of Different Types of Neurons<a class="anchor-link" href="#Examples-of-Different-Types-of-Neurons">&#182;</a></h2><h3 id="Sigmoid">Sigmoid<a class="anchor-link" href="#Sigmoid">&#182;</a></h3><p>$$
-Z_j^{(r)} = \frac{1}{1+\exp(a_j^{(r)})} \in (0,1)
+Z_j^{(r)} = \frac{1}{1+\exp(-a_j^{(r)})} \in (0,1)
 $$</p>
 
 </div>
@@ -12072,7 +12060,7 @@ $$</p>
 </div></section></section><section><section>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#The Softmax function</span>
@@ -12101,7 +12089,7 @@ $$</p>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>[0.034 0.057 0.072 0.18  0.205 0.012 0.276 0.004 0.096 0.063]
+<pre>[0.005 0.152 0.005 0.013 0.036 0.081 0.603 0.039 0.057 0.008]
 final tag = 6
 </pre>
 </div>
@@ -12153,6 +12141,7 @@ $$</p>
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.33</span><span class="p">,</span> <span class="mf">0.33</span><span class="p">,</span> <span class="mf">0.34</span><span class="p">]</span>
 <span class="n">bits</span> <span class="o">=</span> <span class="n">log2</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">bits</span><span class="p">)</span>
 <span class="n">entropy</span> <span class="o">=</span> <span class="o">-</span><span class="nb">sum</span><span class="p">(</span><span class="n">y</span><span class="o">*</span><span class="n">bits</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">entropy</span><span class="p">)</span>
 </pre></div>
@@ -12171,7 +12160,8 @@ $$</p>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>1.58481870497303
+<pre>[-1.59946207 -1.59946207 -1.55639335]
+1.58481870497303
 </pre>
 </div>
 </div>
@@ -12215,10 +12205,11 @@ $$</p>
 </div></div><div class="fragment">
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">log2</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
 <span class="n">entropy</span> <span class="o">=</span> <span class="o">-</span><span class="nb">sum</span><span class="p">(</span><span class="n">y</span><span class="o">*</span><span class="n">log2</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">entropy</span><span class="p">)</span>
 </pre></div>
@@ -12237,7 +12228,8 @@ $$</p>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>0.9219280948873623
+<pre>[-3.32192809 -3.32192809 -0.32192809]
+0.9219280948873623
 </pre>
 </div>
 </div>
@@ -12516,7 +12508,7 @@ $$</p>
 <h2 id="Fitting-the-NN">Fitting the NN<a class="anchor-link" href="#Fitting-the-NN">&#182;</a></h2><ol>
 <li><p>Initialize all the weight and bias parameters $(w_{ij}^{(r)},b_i^{(r)})$  (this is a critical step).</p>
 </li>
-<li><p>For $q = 0,...,{M\over B}-1$ repeat the following steps (2a) - (2f):</p>
+<li><p>For $q = 0,...,{M\over B}-1$, repeat the following steps (2a) - (2f):</p>
 </li>
 </ol>
 
@@ -12600,7 +12592,7 @@ $$</p>
 <p>$$
 b_i^{(r)} \leftarrow b_i^{(r)} - \frac{\eta}{B}\sum_{m=qB}^{(q+1)B} \frac{\partial{\mathcal L}(m)}{\partial b_i^{(r)}},
 $$</p>
-<p>f. Increment $q\leftarrow ((q+1)\mod B)$ and go back to step $(a)$.</p>
+<p>f. Increment $q\leftarrow ((q+1)\mod B)$, and go back to step $(a)$.</p>
 
 </div>
 </div>
@@ -12761,7 +12753,7 @@ $$</p>
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Saddle-Points">Saddle Points<a class="anchor-link" href="#Saddle-Points">&#182;</a></h2><p><img src="images/GD_saddle.png" height="100" width="300"></p>
+<h2 id="Saddle-Points">Saddle Points<a class="anchor-link" href="#Saddle-Points">&#182;</a></h2><p><img src="images/GD_saddle.png" height="100" width="400"></p>
 
 </div>
 </div>
@@ -12771,7 +12763,7 @@ $$</p>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Effect-of-the-Learning-Rate">Effect of the Learning Rate<a class="anchor-link" href="#Effect-of-the-Learning-Rate">&#182;</a></h2><p>The idea is to start with a high learning rate and then adaptively reduce it as we get closer to the minimum of the loss function.</p>
-<p><img src="images/LearningRateAnnealing.png" width="400"></p>
+<p><img src="images/LearningRateAnnealing.png" width="500"></p>
 
 </div>
 </div>
@@ -12780,7 +12772,7 @@ $$</p>
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Annealing">Annealing<a class="anchor-link" href="#Annealing">&#182;</a></h2><p>Reduce the learning rate as a step function when the reduction in the loss function begins to plateau.</p>
+<h2 id="Annealing">Annealing<a class="anchor-link" href="#Annealing">&#182;</a></h2><p>Adjust the learning rate as a step function when the reduction in the loss function begins to plateau.</p>
 <p><img src="images/LearningRateAnnealing2.png" width="500"></p>
 
 </div>
@@ -12841,11 +12833,11 @@ w(n+1) = w(n) + v(n)
 $$</p>
 <p>It can be shown from these equations that $v(n)$ can be written as</p>
 <p>$$
-v(n) = - \eta\sum_{i=0}^{n-1} \rho^{n-i} g(i)   
+v(n) = - \eta\sum_{i=0}^{n} \rho^{n-i} g(i)   
 $$</p>
 <p>so that</p>
 <p>$$
-w(n+1) = w(n) - \eta\sum_{i=0}^{n-1} \rho^{n-i} g(i)   
+w(n+1) = w(n) - \eta\sum_{i=0}^{n} \rho^{n-i} g(i)   
 $$</p>
 
 </div>
@@ -12923,7 +12915,7 @@ $$</li>
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Circular? in order to compute $w(n+1)$ we first need to compute $g(w(n))$. 
+<p><strong>Circular</strong>? in order to compute $w(n+1)$ we first need to compute $g(w(n))$. 
 $$
 w(n+1)\approx w(n) + \rho v(n-1) 
 $$</p>
@@ -13253,16 +13245,7 @@ $$</p>
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Zero-Centering-Helps">Zero Centering Helps<a class="anchor-link" href="#Zero-Centering-Helps">&#182;</a></h2><p><img src="images/zero_centering_helps.png" width="500"></p>
-
-</div>
-</div>
-</div></section></section><section><section>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Recall that for a K-ary Linear Classifier, the parameter update equation is given by:</p>
+<h2 id="Zero-Centering">Zero-Centering<a class="anchor-link" href="#Zero-Centering">&#182;</a></h2><p>Recall that for a K-ary Linear Classifier, the parameter update equation is given by:</p>
 <p>$$
 w_{kj} \leftarrow w_{kj} - \eta x_j(y_k-t_k),\ \ 1\le k\le K,\ \ 1\le j\le N
 $$</p>
@@ -13291,6 +13274,15 @@ $$</p>
 \Delta w_{qj} = -\eta x_j(y_q - 1) &gt; 0
 $$</p>
 <p>i.e. the update results in all the weights moving in the same direction, except for one. This is shown graphically in the Figure above, in which the system is trying move in the direction of the blue arrow which is the quickest path to the minimum. However if the input data is not centered, then it is forced to move in a zig-zag fashion as shown in the red-curve. The zig-zag motion is caused due to the fact that all the parameters move in the same direction at each step due to the lact of zero-centering in the input data.</p>
+
+</div>
+</div>
+</div></section></section><section><section>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Zero-Centering-Helps">Zero Centering Helps<a class="anchor-link" href="#Zero-Centering-Helps">&#182;</a></h2><p><img src="images/zero_centering_helps.png" width="500"></p>
 
 </div>
 </div>
